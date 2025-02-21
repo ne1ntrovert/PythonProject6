@@ -19,6 +19,7 @@ def mask_account_card(card_info):
     else:
         return card_info
 
+
 def get_date(date: str) -> str:
     date_form = f"{date[8:10] + '.' + date[5:7] + '.' + date[2:4]}"
     if "T" in date:
