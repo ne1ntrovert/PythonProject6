@@ -1,6 +1,8 @@
+from typing import Dict, List
+
 import pytest
-from typing import List, Dict
-from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
+
+from src.generators import card_number_generator, filter_by_currency, transaction_descriptions
 
 
 @pytest.mark.parametrize(
@@ -8,15 +10,26 @@ from src.generators import filter_by_currency, transaction_descriptions, card_nu
     [
         (
             [
-                {"index": 1, "amount": 900, "currency": "USD"},
-                {"index": 2, "amount": 400, "currency": "EUR"},
-                {"index": 3, "amount": 150, "currency": "USD"},
-                {"index": 4, "amount": 1400, "currency": "RUB"},
+                {"id": 939719570, "operationAmount": {"amount": "9824.07", "currency": {"code": "USD"}}},
+                {"id": 142264268, "operationAmount": {"amount": "79114.93", "currency": {"code": "USD"}}},
+                {"id": 873106923, "operationAmount": {"amount": "43318.34", "currency": {"code": "RUB"}}},
+                {"id": 895315941, "operationAmount": {"amount": "56883.54", "currency": {"code": "USD"}}},
             ],
             "USD",
-            [{"index": 1, "amount": 900, "currency": "USD"}, {"index": 3, "amount": 150, "currency": "USD"}],
+            [
+                {"id": 939719570, "operationAmount": {"amount": "9824.07", "currency": {"code": "USD"}}},
+                {"id": 142264268, "operationAmount": {"amount": "79114.93", "currency": {"code": "USD"}}},
+                {"id": 895315941, "operationAmount": {"amount": "56883.54", "currency": {"code": "USD"}}},
+            ],
         ),
-        ([{"index": 1, "amount": 900, "currency": "USD"}, {"index": 3, "amount": 150, "currency": "USD"}], "EUR", []),
+        (
+            [
+                {"id": 873106923, "operationAmount": {"amount": "43318.34", "currency": {"code": "RUB"}}},
+                {"id": 594226727, "operationAmount": {"amount": "67314.70", "currency": {"code": "RUB"}}},
+            ],
+            "USD",
+            [],
+        ),
     ],
 )
 def test_filter_by_currency(transactions: List[Dict], currency: str, expected: List[Dict]):
@@ -27,8 +40,19 @@ def test_filter_by_currency(transactions: List[Dict], currency: str, expected: L
     "transactions, expected",
     [
         (
-            [{"index": 1, "amount": 900, "currency": "USD"}, {"index": 2, "amount": 400, "currency": "EUR"}],
-            ["Transaction 1: 900 USD", "Transaction 2: 400 EUR"],
+            [
+                {
+                    "id": 939719570,
+                    "operationAmount": {"amount": "9824.07", "currency": {"code": "USD"}},
+                    "description": "Перевод организации",
+                },
+                {
+                    "id": 142264268,
+                    "operationAmount": {"amount": "79114.93", "currency": {"code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                },
+            ],
+            ["Перевод организации", "Перевод со счета на счет"],
         ),
         ([], []),
     ],
@@ -37,12 +61,12 @@ def test_transaction_descriptions(transactions: List[Dict], expected: List[str])
     assert list(transaction_descriptions(transactions)) == expected
 
 
-@pytest.fixture
-def card_generator():
-    return card_number_generator()
-
-
-def test_card_number_generator(card_generator):
-    first_number = next(card_generator)
-    assert len(first_number) == 19
-    assert first_number[:4] == "0000"
+@pytest.mark.parametrize(
+    "start, stop, expected",
+    [
+        (0, 0, ["0000 0000 0000 0000"]),
+        (1, 2, ["0000 0000 0000 0001", "0000 0000 0000 0002"]),
+    ],
+)
+def test_card_number_generator(start: int, stop: int, expected: List[str]):
+    assert list(card_number_generator(start, stop)) == expected
