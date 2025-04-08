@@ -1,38 +1,36 @@
-from typing import List, Dict, Iterator
+import logging
+import os
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
+logger = logging.getLogger('masks')
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler('logs/masks.log', mode='w')
+file_handler.setLevel(logging.DEBUG)
+
+file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(file_formatter)
+
+logger.addHandler(file_handler)
 
 
-def filter_by_currency(transactions: List[Dict], currency: str) -> Iterator[Dict]:
-    return (transaction for transaction in transactions if transaction.get("currency") == currency)
+def get_mask_card_number(card_number: str) -> str:
+    """маскировка номера карты"""
+    card_str = str(card_number)
+    masked_card = f"{card_str[:4]} {card_str[4:6]}** **** {card_str[-4:]}"
+    logger.info(f"Маскированный номер карты: {masked_card}")
+    return masked_card
 
 
-def transaction_descriptions(transactions: List[Dict]) -> Iterator[str]:
-    return (f"Transaction {t['index']}: {t['amount']} {t['currency']}" for t in transactions)
+def get_mask_account(account_number: str) -> str:
+    """маскировка номера счета"""
+    account_str = str(account_number)
+    masked_account = f"**{account_str[-4:]}"
+    logger.info(f"Маскированный номер счета: {masked_account}")
+    return masked_account
 
 
-def card_number_generator() -> Iterator[str]:
-    for number in range(1, 10**16):
-        yield (
-            f"{number:016}"[:4] + " " + f"{number:016}"[4:8] + " " + f"{number:016}"[8:12] + " " + f"{number:016}"[12:]
-        )
-
-
-transactions = [
-    {"index": 1, "amount": 900, "currency": "USD"},
-    {"index": 2, "amount": 400, "currency": "EUR"},
-    {"index": 3, "amount": 150, "currency": "USD"},
-    {"index": 4, "amount": 1400, "currency": "RUB"},
-]
-
-
-filtered_transactions = filter_by_currency(transactions, "USD")
-for transaction in filtered_transactions:
-    print(transaction)
-
-descriptions = transaction_descriptions(transactions)
-for description in descriptions:
-    print(description)
-
-
-generator = card_number_generator()
-for _ in range(5):
-    print(next(generator))
+print(get_mask_account('36172638712'))
+print(get_mask_card_number('2737193628281631'))

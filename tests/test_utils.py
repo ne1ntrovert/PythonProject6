@@ -1,5 +1,4 @@
 import json
-import os
 import unittest
 from unittest import mock
 
@@ -7,7 +6,6 @@ from src.utils import load_transactions
 
 
 class TestLoadTransactions(unittest.TestCase):
-
 
     @mock.patch("os.path.exists")
     @mock.patch("builtins.open")
@@ -26,7 +24,6 @@ class TestLoadTransactions(unittest.TestCase):
         mock_open.assert_called_once_with("transactions.json", "r", encoding="utf-8")
         mock_json_load.assert_called_once()
 
-
     @mock.patch("os.path.exists")
     def test_load_transactions_file_not_exists(self, mock_exists):
         """проверяет, что возвращается пустой список, если файл не найден"""
@@ -35,7 +32,6 @@ class TestLoadTransactions(unittest.TestCase):
         transactions = load_transactions("non_existent_file.json")
         self.assertEqual(transactions, [])
         mock_exists.assert_called_once_with("non_existent_file.json")
-
 
     @mock.patch("os.path.exists")
     @mock.patch("builtins.open")
@@ -52,7 +48,6 @@ class TestLoadTransactions(unittest.TestCase):
         mock_open.assert_called_once_with("invalid_json_file.json", "r", encoding="utf-8")
         mock_json_load.assert_called_once()
 
-
     @mock.patch("os.path.exists")
     @mock.patch("builtins.open")
     def test_load_transactions_not_a_list(self, mock_open, mock_exists):
@@ -65,7 +60,6 @@ class TestLoadTransactions(unittest.TestCase):
         self.assertEqual(transactions, [])
         mock_exists.assert_called_once_with("not_a_list_file.json")
         mock_open.assert_called_once_with("not_a_list_file.json", "r", encoding="utf-8")
-
 
     @mock.patch("os.path.exists")
     def test_load_transactions_io_error(self, mock_exists):

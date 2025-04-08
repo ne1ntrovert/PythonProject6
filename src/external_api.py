@@ -14,7 +14,7 @@ def convert_to_rub(amount, from_currency):
     if from_currency not in ['USD', 'EUR']:
         raise ValueError("поддерживаются только валюты USD и EUR")
 
-    url = f"https://api.apilayer.com/exchangerates_data/convert"
+    url = "https://api.apilayer.com/exchangerates_data/convert"
 
     params = {
         "from": from_currency,
@@ -32,7 +32,7 @@ def convert_to_rub(amount, from_currency):
         data = response.json()
         return data['result']
     else:
-       raise Exception(f"ошибка при обращении к API: {response.status_code}")
+        raise Exception(f"ошибка при обращении к API: {response.status_code}")
 
 
 def process_transaction(transaction):
